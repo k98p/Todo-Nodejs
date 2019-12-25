@@ -1,13 +1,15 @@
+
+
 GET http://localhost:3000/data/users
 
 ###
 
-POST http://localhost:3000/data/users
+POST http://localhost:3000/data/users/signup
 Content-Type: application/json
 
 {
-    "name": "suckker",
-    "password": "okay"
+    "userId": 34,
+    "password": "pass"
 }
 
 ###
@@ -16,6 +18,25 @@ POST http://localhost:3000/data/users/login
 Content-Type: application/json
 
 {
-    "name": "suckker",
-    "password": "okay"
+    "userId": 4,
+    "password": "4"
+}
+
+###
+
+GET http://localhost:3000/data/todos/
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTU3NzI4OTM2OX0.JaUnoL6BmmsIPxTXTuw6yPWshI4bF9flK3QaByUBaqY 
+###
+
+GET http://localhost:3000/data/todos/2
+
+###
+
+POST http://localhost:3000/data/todos
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTU3NzI4OTM2OX0.JaUnoL6BmmsIPxTXTuw6yPWshI4bF9flK3QaByUBaqY
+Content-Type: application/json
+
+{
+    "userId": 4,
+    "title": "password is too easy to guess"
 }

@@ -1,53 +1,166 @@
 const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
+// var express = require('express');
+// var app = express();
+var cors = require('cors')
+// var bcrypt = require('bcryptjs')
+var jwt = require('jsonwebtoken')
+
+var fs = require('fs')
+var _ = require('lodash')
+var engines = require('consolidate')
+// var todos = require('./update.json')
+var bodyParser = require('body-parser');
 
 app.use(express.json())
+//app.engine('hbs', engines.handlebars)
+app.set('views', './views')
+app.set('view engine', 'hbs')
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json());
+app.use(cors());
+//app.use(express.json());
 
-const users = []
+
+const User = require('./db').User
+const Todo = require('./db').Todo
+
+function isAuthenticated(req, res, next) {
+    if (typeof req.headers.authorization !== "undefined") {
+        let token = req.headers.authorization.split(" ")[1];
+        let privateKey = "KEYTOTHECHEST";
+        // console.log(token);
+        // Here we validate that the JSON Web Token is valid and has been
+        // created using the same private pass phrase
+        jwt.verify(token, privateKey, (err, user) => {
+
+            // if there has been an error...
+            if (err) {
+                // shut them out!
+                res.status(500).json({ error: "Not Authorized" });
+                // throw new Error("Not Authorized");
+            }
+            // if the JWT is valid, allow them to hit
+            // the intended endpoint
+            req.user = user;
+            next();
+        });
+    } else {
+        // No authorization header exists on the incoming
+        // request, return not authorized and throw a new error
+        res.status(500).json({ error: "Not Authorized" });
+        // throw new Error("Not Authorized");
+    }
+}
+
+//=========================USER=======================
 
 app.get('/data/users', (req,res)=>{
-    res.json(users)
+    try{
+        //console.log(typeof users)
+		User.find({},(error, data)=>{
+			res.json(data);
+		})
+	}
+	catch(e){
+		res.sendStatus(404);
+	}
 })
 
-app.post('/data/users', async (req,res)=>{
-    try{
-        const salt = await bcrypt.genSalt()
-        const hashedpassword = await bcrypt.hash(req.body.password,salt)
-        console.log(salt)
-        console.log(hashedpassword)
-        const user = {
-            name: req.body.name,
-            password: hashedpassword
-        }
-        users.push(user)
-        res.status(200).send()
-    }
-    catch{
-        res.status(500).send()
-    }
-})
-
-app.post('/data/users/login', async (req,res)=>{
-    console.log(req.body)
-    const user = users.find((user)=>{
-        return user.name === req.body.name
-    })
-    console.log(user)
-    if (user===null){
-        return res.status(400).send()
-    }
-    try{
-        if ( /*await*/ bcrypt.compare(user.password, req.body.password)){
-            res.send('Success')
+app.post('/data/users/signup', (req,res)=>{
+    const userId = req.body.userId
+    User.findOne({userId: userId}, async (error, user)=>{
+        //console.log(todos);
+        if (user===null){
+            const salt = await bcrypt.genSalt()
+            const hashedpassword = await bcrypt.hash(req.body.password,salt)
+            //console.log(salt)
+            //console.log(hashedpassword)
+            const data = {
+                userId: req.body.userId,
+                password: hashedpassword
+            }
+            console.log(data)
+            User.create(data, (error , new_user)=>{
+                res.json(new_user)
+            })        
         }
         else{
-            res.send('Failure')
+            res.send("User already exists!")
         }
-    }
-    catch{
-        res.status(500).send()
-    }
+    })    
 })
 
-app.listen(3000)
+app.post('/data/users/login', (req,res)=>{
+    //console.log(req.body)
+    const userId = req.body.userId
+    User.findOne({userId: userId}, (error,user)=>{
+        console.log(user)
+        if(user!=null){
+            if ( /*await*/ bcrypt.compare(user.password, req.body.password) || user.password===req.body.password){
+                //res.send('Success')
+                const privateKey = 'KEYTOTHECHEST';
+                const token = jwt.sign({ userId : userId }, privateKey);
+                res.json({token: token});
+            }
+            else{
+                res.send('Failure')    
+            }
+        }
+        else{
+            res.sendStatus(403);
+        }
+    })
+})
+
+//========================================================
+
+//=======================TODO=============================
+
+// app.get('/data/todos/', (req,res)=>{
+// 	try{
+// 		Todo.find({},(error, todos)=>{
+// 			res.json(todos);
+// 		})
+// 	}
+// 	catch(e){
+// 		res.sendStatus(404);
+// 	}
+// })
+
+app.get('/data/todos/', isAuthenticated, (req,res)=>{
+    var uid = req.user.userId
+    console.log(uid)
+	try{
+        Todo.find({userId: uid},(error, todo)=>{
+            res.json(todo);
+            //console.log(todo)
+        })
+	}
+	catch(e){
+		res.sendStatus(404);
+	}
+})
+
+app.post('/data/todos/', isAuthenticated, (req,res)=>{		
+    //console.log(req)
+    let data = {
+            "userId": req.user.userId,
+            "title": req.body.title,
+            "completed": false
+    };
+    console.log(data)
+    //Object.assign(data , req.body);
+    //data.id = id + 1;
+    // console.log(data);
+    Todo.create(data , (error , new_todo) => {
+        console.log(new_todo);
+        res.json(new_todo);
+    })
+})
+
+
+var server = app.listen(3000, function () {
+    console.log('Server running at http://localhost:' + server.address().port)
+})
