@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Login Page</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class = "container" style="padding-top: 75px;">
+			<div id="form-div" style="display: flex; justify-content: space-around;">
+				<form name="user-login">
+					<div class = "row">
+						<input type="text" class="form-input form-control" name="userId" placeholder="UserID">
+                    </div>
+                    <br>
+                    <div class = "row">
+                        <input type="password" class="form-input form-control" name="password" placeholder="Password">
+                    </div>
+                    <br>
+                    <div class = "row">        
+                    	<div class = "col">
+							<button type="button" class = "btn btn-primary" onclick="signup(this.form)">SIGN UP</button>
+                        </div>
+                        <div class = "col">
+							<button type="button" class = "btn btn-primary" onclick="login(this.form)">LOGIN</button>
+						</div>
+					</div>
+				</form>
+			</div>	
+        </div>
+        <script src="login.js">
+        </script>
+    </body>
+</html>

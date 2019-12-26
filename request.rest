@@ -8,8 +8,8 @@ POST http://localhost:3000/data/users/signup
 Content-Type: application/json
 
 {
-    "userId": 34,
-    "password": "pass"
+    "userId": 43,
+    "password": "43"
 }
 
 ###
@@ -18,8 +18,8 @@ POST http://localhost:3000/data/users/login
 Content-Type: application/json
 
 {
-    "userId": 4,
-    "password": "4"
+    "userId": 64,
+    "password": "64"
 }
 
 ###
@@ -28,7 +28,7 @@ GET http://localhost:3000/data/todos/
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTU3NzI4OTM2OX0.JaUnoL6BmmsIPxTXTuw6yPWshI4bF9flK3QaByUBaqY 
 ###
 
-GET http://localhost:3000/data/todos/2
+GET http://localhost:3000/data/todos/5e03892e70faf608d8ec7418
 
 ###
 
@@ -40,3 +40,7 @@ Content-Type: application/json
     "userId": 4,
     "title": "password is too easy to guess"
 }
+
+###
+
+PUT http://localhost:3000/data/todos/5e03892e70faf608d8ec7418

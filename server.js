@@ -1,27 +1,21 @@
 const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
-// var express = require('express');
-// var app = express();
+
 var cors = require('cors')
-// var bcrypt = require('bcryptjs')
 var jwt = require('jsonwebtoken')
 
 var fs = require('fs')
 var _ = require('lodash')
 var engines = require('consolidate')
-// var todos = require('./update.json')
 var bodyParser = require('body-parser');
 
 app.use(express.json())
-//app.engine('hbs', engines.handlebars)
 app.set('views', './views')
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
 app.use(cors());
-//app.use(express.json());
-
 
 const User = require('./db').User
 const Todo = require('./db').Todo
@@ -58,7 +52,6 @@ function isAuthenticated(req, res, next) {
 
 app.get('/data/users', (req,res)=>{
     try{
-        //console.log(typeof users)
 		User.find({},(error, data)=>{
 			res.json(data);
 		})
@@ -79,33 +72,31 @@ app.post('/data/users/signup', (req,res)=>{
             //console.log(hashedpassword)
             const data = {
                 userId: req.body.userId,
-                password: hashedpassword
+                password: req.body.password
             }
             console.log(data)
             User.create(data, (error , new_user)=>{
-                res.json(new_user)
+                res.send(new_user)
             })        
         }
         else{
-            res.send("User already exists!")
+            res.send("User exists!")
         }
     })    
 })
 
 app.post('/data/users/login', (req,res)=>{
-    //console.log(req.body)
     const userId = req.body.userId
-    User.findOne({userId: userId}, (error,user)=>{
+    User.findOne({userId: userId}, async (error,user)=>{
         console.log(user)
-        if(user!=null){
-            if ( /*await*/ bcrypt.compare(user.password, req.body.password) || user.password===req.body.password){
-                //res.send('Success')
+        if(user!==null){
+            if (await bcrypt.compare(user.password, req.body.password) || user.password===req.body.password){
                 const privateKey = 'KEYTOTHECHEST';
                 const token = jwt.sign({ userId : userId }, privateKey);
                 res.json({token: token});
             }
             else{
-                res.send('Failure')    
+                res.json({token: null})   
             }
         }
         else{
@@ -118,16 +109,17 @@ app.post('/data/users/login', (req,res)=>{
 
 //=======================TODO=============================
 
-// app.get('/data/todos/', (req,res)=>{
-// 	try{
-// 		Todo.find({},(error, todos)=>{
-// 			res.json(todos);
-// 		})
-// 	}
-// 	catch(e){
-// 		res.sendStatus(404);
-// 	}
-// })
+app.get('/data/todos/:id', (req,res)=>{
+    const id = req.params.id
+    try{
+		Todo.find({_id: id},(error, todos)=>{
+			res.json(todos);
+		})
+	}
+	catch(e){
+		res.sendStatus(404);
+	}
+})
 
 app.get('/data/todos/', isAuthenticated, (req,res)=>{
     var uid = req.user.userId
@@ -135,7 +127,6 @@ app.get('/data/todos/', isAuthenticated, (req,res)=>{
 	try{
         Todo.find({userId: uid},(error, todo)=>{
             res.json(todo);
-            //console.log(todo)
         })
 	}
 	catch(e){
@@ -144,22 +135,39 @@ app.get('/data/todos/', isAuthenticated, (req,res)=>{
 })
 
 app.post('/data/todos/', isAuthenticated, (req,res)=>{		
-    //console.log(req)
     let data = {
             "userId": req.user.userId,
             "title": req.body.title,
             "completed": false
     };
     console.log(data)
-    //Object.assign(data , req.body);
-    //data.id = id + 1;
-    // console.log(data);
     Todo.create(data , (error , new_todo) => {
         console.log(new_todo);
         res.json(new_todo);
     })
 })
 
+app.put('/data/todos/:id', isAuthenticated, (req,res)=>{		
+    const id = req.params.id
+    Todo.findOne({_id: id}, (err, todo)=>{
+        // todo.completed = (todo.completed===true?false:true)
+        todo.completed = req.body.completed
+        Todo.findOneAndUpdate({_id: id}, todo, ()=>{
+            res.json(todo)
+        })
+    })
+    //Why findOneAndUpdate is inside findOne?
+})
+
+//=========================================================
+
+//=========================REDIRECTS=======================
+
+app.get('/', (res,req)=>{
+    fs.readFile('./index.html', (err,html)=>{})
+})
+
+//=========================================================
 
 var server = app.listen(3000, function () {
     console.log('Server running at http://localhost:' + server.address().port)
