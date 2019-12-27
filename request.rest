@@ -8,8 +8,8 @@ POST http://localhost:3000/data/users/signup
 Content-Type: application/json
 
 {
-    "userId": 43,
-    "password": "43"
+    "userId": 200,
+    "password": "200"
 }
 
 ###
@@ -18,8 +18,8 @@ POST http://localhost:3000/data/users/login
 Content-Type: application/json
 
 {
-    "userId": 64,
-    "password": "64"
+    "userId": 69,
+    "password": "65"
 }
 
 ###

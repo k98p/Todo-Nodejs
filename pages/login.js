@@ -1,4 +1,6 @@
-localStorage.setItem("token", 0)
+if (localStorage.getItem("token")){
+	window.location = './todo.html';
+}
 
 function signup(frm){
     if (frm.userId.value.length === 0 || frm.password.value.length === 0){

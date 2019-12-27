@@ -1,5 +1,9 @@
 const accesstoken_stored = localStorage.getItem("token");
 
+function ClearStorage(){
+    localStorage.removeItem("token")
+}
+
 fetch('http://localhost:3000/data/todos/', {
         method: 'GET',
         headers: {
@@ -18,12 +22,12 @@ fetch('http://localhost:3000/data/todos/', {
 						</input>
 					</label><br>` + todos_list.innerHTML
 			//console.log(typeof todo["completed"])
-			if(todo["completed"]==true){
+			if(todo["completed"]){
 				//console.log("COMPLETED")
 				//console.log(todo)
 				document.getElementById(`text_${todo._id}`).setAttribute("style" , "text-decoration: line-through;");
 				document.getElementById(`label_${todo._id}`).setAttribute("style", "border-color: #28a745 !important;")
-				document.getElementById(`checkbox_${todo._id}`).checked = true;
+				document.getElementById(`checkbox_${todo._id}`).checked = todo.completed;
 			}
 			else{
 				//console.log("PENDING")
@@ -95,7 +99,8 @@ function add_func(frm){
 															<span id="text_${data._id}">${data.title}</span>
 														</input>
 													</label>` + docu_list.innerHTML;
-			})
+            })
+        frm.todo_title.value = ''
 	}
 }
 

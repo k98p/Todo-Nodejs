@@ -72,7 +72,7 @@ app.post('/data/users/signup', (req,res)=>{
             //console.log(hashedpassword)
             const data = {
                 userId: req.body.userId,
-                password: req.body.password
+                password: hashedpassword
             }
             console.log(data)
             User.create(data, (error , new_user)=>{
@@ -87,17 +87,26 @@ app.post('/data/users/signup', (req,res)=>{
 
 app.post('/data/users/login', (req,res)=>{
     const userId = req.body.userId
-    User.findOne({userId: userId}, async (error,user)=>{
-        console.log(user)
+    User.findOne({userId: userId}, (error,user)=>{
+        //console.log(user)
         if(user!==null){
-            if (await bcrypt.compare(user.password, req.body.password) || user.password===req.body.password){
-                const privateKey = 'KEYTOTHECHEST';
-                const token = jwt.sign({ userId : userId }, privateKey);
-                res.json({token: token});
-            }
-            else{
-                res.json({token: null})   
-            }
+            bcrypt.compare(req.body.password, user.password, (err,result)=>{
+                
+                if (result){
+                    const privateKey = 'KEYTOTHECHEST';
+                    const token = jwt.sign({ userId : userId }, privateKey);
+                    res.json({token: token});
+                }
+                else{
+                    res.json({token: null})
+                }
+            })
+            // if (bcrypt.compare(req.body.password, user.password) || user.password===req.body.password){
+                
+            // }
+            // else{
+                   
+            // }
         }
         else{
             res.sendStatus(403);
@@ -123,7 +132,7 @@ app.get('/data/todos/:id', (req,res)=>{
 
 app.get('/data/todos/', isAuthenticated, (req,res)=>{
     var uid = req.user.userId
-    console.log(uid)
+    //console.log(uid)
 	try{
         Todo.find({userId: uid},(error, todo)=>{
             res.json(todo);

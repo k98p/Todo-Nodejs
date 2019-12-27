@@ -11,8 +11,9 @@
     </head>
     <body>
         <div class = "container" style="padding-top: 75px;">
-			<div id="form-div" style="display: flex; justify-content: space-around;">
-				<form name="user-login">
+			<div id="form-div" class = "row">
+                <div class = "col col-lg-4"></div>
+                <form name="user-login" class = "col col-lg-4">
 					<div class = "row">
 						<input type="text" class="form-input form-control" name="userId" placeholder="UserID">
                     </div>
@@ -21,15 +22,14 @@
                         <input type="password" class="form-input form-control" name="password" placeholder="Password">
                     </div>
                     <br>
-                    <div class = "row">        
-                    	<div class = "col">
-							<button type="button" class = "btn btn-primary" onclick="signup(this.form)">SIGN UP</button>
-                        </div>
-                        <div class = "col">
-							<button type="button" class = "btn btn-primary" onclick="login(this.form)">LOGIN</button>
-						</div>
+                    <div style="display: flex; justify-content: center;">        
+                        <button type="button" class = "btn btn-primary" onclick="signup(this.form)" style="margin-right: 10px;">SIGN UP</button>
+                    
+                        <button type="button" class = "btn btn-primary" onclick="login(this.form)" style="margin-left: 10px;">LOGIN</button>
+                    
 					</div>
-				</form>
+                </form>
+                <div class = "col col-lg-4"></div>
 			</div>	
         </div>
         <script src="login.js">
