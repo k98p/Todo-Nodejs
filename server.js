@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
+const env = require('dotenv').config()
 
 var cors = require('cors')
 var jwt = require('jsonwebtoken')
@@ -23,7 +24,7 @@ const Todo = require('./db').Todo
 function isAuthenticated(req, res, next) {
     if (typeof req.headers.authorization !== "undefined") {
         let token = req.headers.authorization.split(" ")[1];
-        let privateKey = "KEYTOTHECHEST";
+        let privateKey = process.env.ACCESS_TOKEN;
         // console.log(token);
         // Here we validate that the JSON Web Token is valid and has been
         // created using the same private pass phrase
@@ -93,7 +94,7 @@ app.post('/data/users/login', (req,res)=>{
             bcrypt.compare(req.body.password, user.password, (err,result)=>{
                 
                 if (result){
-                    const privateKey = 'KEYTOTHECHEST';
+                    const privateKey = process.env.ACCESS_TOKEN;
                     const token = jwt.sign({ userId : userId }, privateKey);
                     res.json({token: token});
                 }
